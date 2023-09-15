@@ -95,35 +95,43 @@ def depthFirstSearch(problem:SearchProblem)->List[Direction]:
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
+    visited = []
+    l = util.Stack()
+    l.push((problem.getStartState(), []))
 
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
-    s = problem.getStartState()
-    V = []
-    L = util.Stack()
-    L.push(s)
-    print("tester1", L.isEmpty())
-    while not L.isEmpty():
-        s = L.pop()
-        if problem.isGoalState(s):
-            print("yesyes")
-            return V
-        else:
-            for fringe in problem.getSuccessors(s):
-                if fringe not in V:
-                    L.push(fringe)
-                    V.append(fringe)
+    while not l.isEmpty():
+        state, actions = l.pop()
+
+        if problem.isGoalState(state):
+            return actions
+
+        if state not in visited:
+            visited.append(state)
+            for next_state, action, _ in problem.getSuccessors(state):
+                if next_state not in visited:
+                    l.push((next_state, actions + [action]))
     util.raiseNotDefined()
 
 
 def breadthFirstSearch(problem:SearchProblem)->List[Direction]:
     """Search the shallowest nodes in the search tree first."""
+    visited = []
+    l = util.Queue()
+    l.push((problem.getStartState(), []))
+
+    while not l.isEmpty():
+        state, actions = l.pop()
+
+        if problem.isGoalState(state):
+            return actions
+
+        if state not in visited:
+            visited.append(state)
+            for next_state, action, _ in problem.getSuccessors(state):
+                if next_state not in visited:
+                    l.push((next_state, actions + [action]))
 
 
-    '''
-        INSÉREZ VOTRE SOLUTION À LA QUESTION 2 ICI
-    '''
 
     util.raiseNotDefined()
 
