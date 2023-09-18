@@ -137,11 +137,24 @@ def breadthFirstSearch(problem:SearchProblem)->List[Direction]:
 
 def uniformCostSearch(problem:SearchProblem)->List[Direction]:
     """Search the node of least total cost first."""
+    l = util.PriorityQueue()
+    l.push((problem.getStartState(), [], 0), 0)
+    visited = []
 
+    while not l.isEmpty():
+        state, actions, cost = l.pop()
 
-    '''
-        INSÉREZ VOTRE SOLUTION À LA QUESTION 3 ICI
-    '''
+        if problem.isGoalState(state):
+            return actions
+
+        if state not in visited:
+            visited.append(state)
+
+            for next_state, action, step_cost in problem.getSuccessors(state):
+                new_cost = cost + step_cost
+                new_actions = actions + [action]
+                if next_state not in visited:
+                    l.update((next_state, new_actions, new_cost), new_cost)
 
     util.raiseNotDefined()
 
