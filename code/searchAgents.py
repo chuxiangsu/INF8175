@@ -485,8 +485,8 @@ def foodHeuristic(state, problem: FoodSearchProblem):
     #Déstructuration de state pour avoir les coordoonées des états considérés et la grille de nourriture
     position, foodGrid = state
 
-    #Assignation de la grille de nourriture ainsi qu'initialisation de l'heuristique à 0
-    heuristic = 0
+    #Initialisation de la liste contenant les valeurs heuristiques calculées pour un état et assignation de la grille de nourriture
+    heuristic_list = set()
     food_list = foodGrid.asList()
 
     #L'heuristique retourne 0 si il n'y a plus de nourriture (état final atteint), donc non-triviale
@@ -496,11 +496,9 @@ def foodHeuristic(state, problem: FoodSearchProblem):
     #Boucle qui va à travers la liste des coordonnées des nourritures 
     #et retourne une heuristique représentant la vraie distance (calculée avec l'algorithme de recherche BFS)
     #entre la position d'un état et la nourriture la plus loin
+    #Nous allons prendre le max entre les heuristiques calculées qui va représenter la distance la plus grande d'un état à une nourriture quelconque
     for food_coord in food_list:
-        dist_node_food = realDist(position, food_coord, problem.startingGameState)
-        if dist_node_food > heuristic:
-            heuristic = dist_node_food
-            
+        heuristic_list.add(realDist(position, food_coord, problem.startingGameState))
     #Nous sommes certains que l'heuristique est consistante et non-triviale car :
     #1) Elle ne retournera pas une même constante pour chaque noeud exploré 
     #car la distance est nécessairement différente pour chaque état et une nourriture éloignée
@@ -508,4 +506,4 @@ def foodHeuristic(state, problem: FoodSearchProblem):
     #3) L'heuristique sousestime le chemin optimal car elle nous donnera toujours le coût (distance) pour arriver directement à la nourriture la plus éloignée,
     #tandis que la solution optimale pour cet état prendra soit exactement ce coût ou plus car elle doit considérer les autres nourritures 
     #qui pourront lui faire un détour (donc coût nécessairement plus grand)
-    return heuristic
+    return max(heuristic_list)
