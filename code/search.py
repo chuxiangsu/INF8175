@@ -95,61 +95,74 @@ def depthFirstSearch(problem:SearchProblem)->List[Direction]:
     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
-    visited = []
+
+    #Initialisation de la fringe de départ (LIFO) ainsi que de la structure gardant en mémoire les états déjà visités
     l = util.Stack()
     l.push((problem.getStartState(), []))
+    visited = set()
 
+    #Boucle sur la recherche d'une solution tant que la fringe n'est pas vide ou que l'état final n'a pas été trouvé
     while not l.isEmpty():
         state, actions = l.pop()
-
+        #Retour des actions nécessaires pour arriver à la solution trouvée si l'état final est trouvé
         if problem.isGoalState(state):
             return actions
 
+        #Vérification de si l'état a déjà été visité, sinon ajout dans la structure de données
         if state not in visited:
-            visited.append(state)
+            visited.add(state)
+            #Pour les états successeurs, vérification de si état déjà visité et si non, ajout dans la fringe
             for next_state, action, _ in problem.getSuccessors(state):
                 if next_state not in visited:
                     l.push((next_state, actions + [action]))
-    util.raiseNotDefined()
 
+    util.raiseNotDefined()
 
 def breadthFirstSearch(problem:SearchProblem)->List[Direction]:
     """Search the shallowest nodes in the search tree first."""
-    visited = []
+
+    #Initialisation de la fringe de départ (FIFO) ainsi que de la structure gardant en mémoire les états déjà visités
     l = util.Queue()
     l.push((problem.getStartState(), []))
+    visited = set()
 
+    #Boucle sur la recherche d'une solution tant que la fringe n'est pas vide ou que l'état final n'a pas été trouvé
     while not l.isEmpty():
         state, actions = l.pop()
-
+        #Retour des actions nécessaires pour arriver à la solution trouvée si l'état final est trouvé
         if problem.isGoalState(state):
             return actions
-
+        
+        #Vérification de si l'état a déjà été visité, sinon ajout dans la structure de données
         if state not in visited:
-            visited.append(state)
+            visited.add(state)
+            #Pour les états successeurs, vérification de si état déjà visité et si non, ajout dans la fringe
             for next_state, action, _ in problem.getSuccessors(state):
                 if next_state not in visited:
                     l.push((next_state, actions + [action]))
-
-
 
     util.raiseNotDefined()
 
 def uniformCostSearch(problem:SearchProblem)->List[Direction]:
     """Search the node of least total cost first."""
+
+    #Initialisation de la fringe de départ (PriorityQueue) ainsi que de la structure gardant en mémoire les états déjà visités
     l = util.PriorityQueue()
     l.push((problem.getStartState(), [], 0), 0)
-    visited = []
+    visited = set()
 
+    #Boucle sur la recherche d'une solution tant que la fringe n'est pas vide ou que l'état final n'a pas été trouvé
     while not l.isEmpty():
         state, actions, cost = l.pop()
-
+        #Retour des actions nécessaires pour arriver à la solution trouvée si l'état final est trouvé
         if problem.isGoalState(state):
             return actions
-
+        
+        #Vérification de si l'état a déjà été visité, sinon ajout dans la structure de données
         if state not in visited:
-            visited.append(state)
-
+            visited.add(state)
+            #Pour les états successeurs, vérification de si état déjà visité et si non, ajout dans la fringe
+            #Calcul du coût engendré jusqu'à présent + le coût de transition vers un état successeur
             for next_state, action, step_cost in problem.getSuccessors(state):
                 new_cost = cost + step_cost
                 new_actions = actions + [action]
@@ -167,20 +180,25 @@ def nullHeuristic(state:GameState, problem:SearchProblem=None)->List[Direction]:
 
 def aStarSearch(problem:SearchProblem, heuristic=nullHeuristic)->List[Direction]:
     """Search the node that has the lowest combined cost and heuristic first."""
+
+    #Initialisation de la fringe de départ (PriorityQueue) ainsi que de la structure gardant en mémoire les états déjà visités
     l = util.PriorityQueue()
     l.push((problem.getStartState(), [], 0), 0)
-    visited = []
+    visited = set()
 
+    #Boucle sur la recherche d'une solution tant que la fringe n'est pas vide ou que l'état final n'a pas été trouvé
     while not l.isEmpty():
         state, actions, cost = l.pop()
         current_state_heuristic = heuristic(state,problem)
-
+        #Retour des actions nécessaires pour arriver à la solution trouvée si l'état final est trouvé
         if problem.isGoalState(state):
             return actions
-
+        
+        #Vérification de si l'état a déjà été visité, sinon ajout dans la structure de données
         if state not in visited:
-            visited.append(state)
-
+            visited.add(state)
+            #Pour les états successeurs, vérification de si état déjà visité et si non, ajout dans la fringe
+            #Calcul du coût engendré jusqu'à présent + le coût de transition vers un état successeur - heuristique de l'état précédent + l'heuristique de l'état successeur
             for next_state, action, step_cost in problem.getSuccessors(state):
                 next_state_heuristic = heuristic(next_state,problem)
                 new_cost = cost + step_cost - current_state_heuristic + next_state_heuristic
@@ -189,7 +207,6 @@ def aStarSearch(problem:SearchProblem, heuristic=nullHeuristic)->List[Direction]
                     l.update((next_state, new_actions, new_cost), new_cost)
                     
     util.raiseNotDefined()
-
 
 # Abbreviations
 bfs = breadthFirstSearch

@@ -472,12 +472,40 @@ def foodHeuristic(state, problem: FoodSearchProblem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
+
+    #Nested function qui retourne la vraie distance entre 2 coordonnées en utilisant l'algorithme de recherche BFS
+    #car elle nous assure une solution optimale si les coûts sont égaux entre toutes les transitions (solution en moins d'actions possibles)
+    #Le initialGame représente le jeu avec les nourritures placées à l'état initial
+    def realDist(coord1, coord2, initialGame):
+        probl = PositionSearchProblem(
+            initialGame, start=coord1, goal=coord2, visualize=False, warn = False)
+        #Nous retourne le nombre de transitions nécessaires pour arriver de coord1 à coord2 (taille de la liste de directions)
+        return len(search.bfs(probl))
+    
+    #Déstructuration de state pour avoir les coordoonées des états considérés et la grille de nourriture
     position, foodGrid = state
 
-    '''
-        INSÉREZ VOTRE SOLUTION À LA QUESTION 7 ICI
-    '''
+    #Assignation de la grille de nourriture ainsi qu'initialisation de l'heuristique à 0
+    heuristic = 0
+    food_list = foodGrid.asList()
 
+    #L'heuristique retourne 0 si il n'y a plus de nourriture (état final atteint), donc non-triviale
+    if len(food_list) == 0:
+        return 0
 
-    return 0
-
+    #Boucle qui va à travers la liste des coordonnées des nourritures 
+    #et retourne une heuristique représentant la vraie distance (calculée avec l'algorithme de recherche BFS)
+    #entre la position d'un état et la nourriture la plus loin
+    for food_coord in food_list:
+        dist_node_food = realDist(position, food_coord, problem.startingGameState)
+        if dist_node_food > heuristic:
+            heuristic = dist_node_food
+            
+    #Nous sommes certains que l'heuristique est consistante et non-triviale car :
+    #1) Elle ne retournera pas une même constante pour chaque noeud exploré 
+    #car la distance est nécessairement différente pour chaque état et une nourriture éloignée
+    #2) L'heuristique donnera 0 à l'état final
+    #3) L'heuristique sousestime le chemin optimal car elle nous donnera toujours le coût (distance) pour arriver directement à la nourriture la plus éloignée,
+    #tandis que la solution optimale pour cet état prendra soit exactement ce coût ou plus car elle doit considérer les autres nourritures 
+    #qui pourront lui faire un détour (donc coût nécessairement plus grand)
+    return heuristic
