@@ -283,17 +283,14 @@ class CornersProblem(search.SearchProblem):
         self.walls = startingGameState.getWalls()
         self.startingPosition = startingGameState.getPacmanPosition()
         top, right = self.walls.height-2, self.walls.width-2
-        self.corners = ((1,1), (1,top), (right, 1), (right, top))
+        self.corners = ((1, 1), (1, top), (right, 1), (right, top))
         for corner in self.corners:
             if not startingGameState.hasFood(*corner):
                 print('Warning: no food in corner ' + str(corner))
         self._expanded = 0 # DO NOT CHANGE; Number of search nodes expanded
         # Please add any code here which you would like to use
         # in initializing the problem
-  
-        '''
-            INSÉREZ VOTRE SOLUTION À LA QUESTION 5 ICI
-        '''
+
 
 
     def getStartState(self):
@@ -302,22 +299,14 @@ class CornersProblem(search.SearchProblem):
         space)
         """
 
-        '''
-            INSÉREZ VOTRE SOLUTION À LA QUESTION 5 ICI
-        '''
-        
-        util.raiseNotDefined()
+        return self.startingPosition, ()
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
 
-        '''
-            INSÉREZ VOTRE SOLUTION À LA QUESTION 5 ICI
-        '''
-
-        util.raiseNotDefined()
+        return set(self.corners) == set(state[1])
 
     def getSuccessors(self, state):
         """
@@ -338,14 +327,25 @@ class CornersProblem(search.SearchProblem):
             #   dx, dy = Actions.directionToVector(action)
             #   nextx, nexty = int(x + dx), int(y + dy)
             #   hitsWall = self.walls[nextx][nexty]
-           
-            '''
-                INSÉREZ VOTRE SOLUTION À LA QUESTION 5 ICI
-            '''
 
+            x, y = state[0][:]
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
 
+            #L'action est valide s'il n'y a pas de mur
+            if not self.walls[nextx][nexty]:
+                next_position = (nextx, nexty)
+                corners_status = state[1]
+
+                #Une fois passé par un des quatre coins, ajouter le coin dans la liste des coins déjà visités
+                if next_position in self.corners and next_position not in state[1]:
+                    corners_status = corners_status + (next_position,)
+
+                next_state = (next_position, corners_status)
+                successors.append((next_state, action, 1))
         self._expanded += 1 # DO NOT CHANGE
         return successors
+
 
     def getCostOfActions(self, actions):
         """
@@ -373,14 +373,38 @@ def cornersHeuristic(state, problem):
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
     """
+    from util import manhattanDistance
+
     corners = problem.corners # These are the corner coordinates
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
-    '''
-        INSÉREZ VOTRE SOLUTION À LA QUESTION 6 ICI
-    '''
-    
-    return 0
+    current_position = state[0]
+    corners_status = state[1]
+
+    pacman_fruit = 0
+    #find fruit
+    fruit_position = list(set(corners) - set(corners_status))
+
+    if fruit_position:
+        chosen_fruit = fruit_position[0]
+        pacman_fruit = util.manhattanDistance(current_position, chosen_fruit)
+
+        for fruit in fruit_position:
+            distance = util.manhattanDistance(current_position, fruit)
+            if distance < pacman_fruit:
+                pacman_fruit = distance
+                chosen_fruit = fruit
+
+        if len(fruit_position) > 1:
+            fruit_fruit = util.manhattanDistance(chosen_fruit, fruit_position[0])
+            fruit_position.remove(chosen_fruit)
+            for fruit2 in fruit_position:
+                distance = util.manhattanDistance(fruit2, chosen_fruit)
+                if distance < fruit_fruit:
+                    fruit_fruit = distance
+            pacman_fruit += fruit_fruit
+
+    return pacman_fruit
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
