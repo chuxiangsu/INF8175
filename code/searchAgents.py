@@ -1,3 +1,6 @@
+# Casta Ung, 2260067
+# Chu Xiang Su, 2079797
+
 # searchAgents.py
 # ---------------
 # Licensing Information:  You are free to use or extend these projects for
@@ -10,7 +13,6 @@
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
-
 
 """
 This file contains all of the agents that can be selected to control Pacman.  To
@@ -383,7 +385,7 @@ def cornersHeuristic(state, problem):
     corners_status = state[1]
 
     pacman_fruit = 0
-    
+
     #trouver la nourriture
     fruit_position = list(set(corners) - set(corners_status))
 
