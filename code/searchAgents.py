@@ -332,7 +332,7 @@ class CornersProblem(search.SearchProblem):
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
 
-            #L'action est valide s'il n'y a pas de mur
+            #Détermine si l'action est valide par si la prochaine position frappe un mur
             if not self.walls[nextx][nexty]:
                 next_position = (nextx, nexty)
                 corners_status = state[1]
@@ -343,6 +343,7 @@ class CornersProblem(search.SearchProblem):
 
                 next_state = (next_position, corners_status)
                 successors.append((next_state, action, 1))
+
         self._expanded += 1 # DO NOT CHANGE
         return successors
 
@@ -382,24 +383,25 @@ def cornersHeuristic(state, problem):
     corners_status = state[1]
 
     pacman_fruit = 0
-    #find fruit
+    
+    #trouver la nourriture
     fruit_position = list(set(corners) - set(corners_status))
 
     if fruit_position:
         chosen_fruit = fruit_position[0]
-        pacman_fruit = util.manhattanDistance(current_position, chosen_fruit)
+        pacman_fruit = manhattanDistance(current_position, chosen_fruit)
 
         for fruit in fruit_position:
-            distance = util.manhattanDistance(current_position, fruit)
+            distance = manhattanDistance(current_position, fruit)
             if distance < pacman_fruit:
                 pacman_fruit = distance
                 chosen_fruit = fruit
 
         if len(fruit_position) > 1:
-            fruit_fruit = util.manhattanDistance(chosen_fruit, fruit_position[0])
+            fruit_fruit = manhattanDistance(chosen_fruit, fruit_position[0])
             fruit_position.remove(chosen_fruit)
             for fruit2 in fruit_position:
-                distance = util.manhattanDistance(fruit2, chosen_fruit)
+                distance = manhattanDistance(fruit2, chosen_fruit)
                 if distance < fruit_fruit:
                     fruit_fruit = distance
             pacman_fruit += fruit_fruit
