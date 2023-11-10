@@ -30,8 +30,37 @@ var int: objectif_match_espaces;
 %-----------------------------------------------------------------------------%
 % Partie étudiant
 %-----------------------------------------------------------------------------%
+% Chaque paire d'équipes doit se rencontrer deux fois
+constraint forall(e1, e2 in equipes where e1 < e2) (
+  rencontres[e1, e2] = 2
+);
 
+% Un terrain ne peut accueillir plus de deux équipes
+constraint forall(j in jours, t in terrains) (
+  sum(e in equipes) (calendrier[e,j] = t) <= 2
+ );
+ 
+% Une équipe ne doit pas jouer plus de 7 jours sur son propre terrain
+array[equipes] of int: equipe_indices = [1, 2, 3, 4, 5, 6, 7, 8];
+constraint forall(e in equipes) (
+    sum(j in jours) (calendrier[e, j] = equipe_indices[e]) <= 7
+);
 
+% Si une équipe ne joue pas lors d’une période, elle est placée sur le terrain n°0
+% Les deux rencontres de deux équipes doivent être espacées d'au moins 3 jours
+constraint forall(e1, e2 in equipes where e1 < e2) (
+    let { var int: jour1 = dates[e1, e2].1, var int: jour2 = dates[e1, e2].2 } in (
+        (jour1 != 0 /\ jour2 != 0) -> abs(jour1 - jour2) >= 3
+    )
+);
+
+% Les deux rencontres entre deux équipes doivent se dérouler sur des terrains différents
+constraint forall(e1, e2 in equipes where e1 < e2) (
+    calendrier[e1, dates[e1, e2].1] != calendrier[e2, dates[e1, e2].2]
+);
+
+% Trouver une solution qui maximisez le nombre de matchs joués tout en respectant les contraintes
+solve maximize objectif_match_espaces;
 
 %-----------------------------------------------------------------------------%
 
