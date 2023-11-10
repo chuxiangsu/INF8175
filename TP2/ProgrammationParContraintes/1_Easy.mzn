@@ -22,7 +22,7 @@ var int: longueur;
 % Partie étudiant
 %-----------------------------------------------------------------------------%
 
-% Assigner la longueur de la plage à la distance maximale entre 2 fréquences
+% Assigner la longueur de la plage à la distance maximale entre 2 fréquences (dernier élément, car tri en ordre croissant)
 longueur = frequences[m];
 
 % Contrainte pour ordonner les fréquences en ordre croissant
