@@ -59,6 +59,7 @@ constraint forall(e1, e2 in equipes where e1 < e2) (
     calendrier[e1, dates[e1, e2].1] != calendrier[e2, dates[e1, e2].2]
 );
 
+
 % Trouver une solution qui maximisez le nombre de matchs joués tout en respectant les contraintes
 solve maximize objectif_match_espaces;
 
