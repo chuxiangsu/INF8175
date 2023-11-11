@@ -1,5 +1,5 @@
-% NOM_ETUDIANT_1 (MATRICULE_1)
-% NOM_ETUDIANT_2 (MATRICULE_2)
+% Chu Xiang Su (2079797)
+% Casta Ung (2260067)
 
 include "globals.mzn";
 
@@ -30,22 +30,64 @@ var int: objectif_match_espaces;
 %-----------------------------------------------------------------------------%
 % Partie étudiant
 %-----------------------------------------------------------------------------%
+
+
+% Bonsoir, pour le problème 3 de la partie 2, je ne comprends pas le 'to_enum(equipe, i)'. 
+% Ça représente le terrain associé à chaque équipe mais qu'est ce que c'est ? Est ce que c est censé être un enum qu'on doit créer ? Merci
+
+% Hello,
+% J'ai utilisé la fonction to_enum comme suit:
+% array[1..card(equipes)] of equipes: equipe_du_terrain = to_enum(equipes, 1..card(equipes));
+% Ainsi, j'ai déclaré un array où equipe_du_terrain[t] est l'équipe possédant le terrain t.
+
+% La compétition doit respecter les règles suivantes :
+% 1. Pour effectuer une rencontre, deux équipe doivent être présente sur le même terrain.
+
+array[equipes] of int: equipe_indices = [1, 2, 3, 4, 5, 6, 7, 8];
+
+
+% 2. Un match doit avoir lieu sur le terrain désigné comme le domicile de l’une des deux équipes.
+% Un match entre 2 équipes doit avoir lieu sur un terrain domicile de l'une des 2 équipes
+constraint forall(e1, e2 in equipes where e1 < e2) (
+  (calendrier[e1, dates[e1, e2].1]= equipe_indices[e1] \/ calendrier[e1, dates[e1, e2].1]= equipe_indices[e2]) /\ 
+  (calendrier[e1, dates[e1, e2].2]= equipe_indices[e1] \/ calendrier[e1, dates[e1, e2].2]= equipe_indices[e2])
+ ); 
+% constraint forall(e1, e2 in equipes where e1 < e2)(
+%   calendrier[e2, dates[e1, e2].1]= calendrier[e1, dates[e1, e2].1] /\ calendrier[e2, dates[e1, e2].2]= calendrier[e1, dates[e1, e2].2]
+% );
+
+
+constraint forall(e1, e2 in equipes where e1 < e2) (
+  (calendrier[e2, dates[e1, e2].1]= equipe_indices[e1] \/ calendrier[e2, dates[e1, e2].1]= equipe_indices[e2]) /\ 
+  (calendrier[e2, dates[e1, e2].2]= equipe_indices[e1] \/ calendrier[e2, dates[e1, e2].2]= equipe_indices[e2])
+ ); 
+
+
+% 6. Les équipes doivent jouer deux fois l’une contre l’autre.
 % Chaque paire d'équipes doit se rencontrer deux fois
 constraint forall(e1, e2 in equipes where e1 < e2) (
   rencontres[e1, e2] = 2
 );
 
+% 3. Un terrain ne peut accueillir plus de deux équipes.
 % Un terrain ne peut accueillir plus de deux équipes
 constraint forall(j in jours, t in terrains) (
   sum(e in equipes) (calendrier[e,j] = t) <= 2
  );
- 
+
+
+% 5. Une équipe ne doit pas jouer trop souvent à domicile, elle n’est donc pas autorisée à jouer plus
+% de 7 jours sur son propre terrain.
 % Une équipe ne doit pas jouer plus de 7 jours sur son propre terrain
-array[equipes] of int: equipe_indices = [1, 2, 3, 4, 5, 6, 7, 8];
+
 constraint forall(e in equipes) (
     sum(j in jours) (calendrier[e, j] = equipe_indices[e]) <= 7
 );
 
+
+
+% 4. Si une équipe ne joue pas lors d’une période elle est placée sur le terrain n°0.
+% 7. Les deux rencontres de deux équipes doivent être espacées de 3 jours au minimum.
 % Si une équipe ne joue pas lors d’une période, elle est placée sur le terrain n°0
 % Les deux rencontres de deux équipes doivent être espacées d'au moins 3 jours
 constraint forall(e1, e2 in equipes where e1 < e2) (
@@ -54,12 +96,22 @@ constraint forall(e1, e2 in equipes where e1 < e2) (
     )
 );
 
+% 8. Les deux rencontres de deux équipes doivent avoir lieu sur des terrains différents
 % Les deux rencontres entre deux équipes doivent se dérouler sur des terrains différents
 constraint forall(e1, e2 in equipes where e1 < e2) (
-    calendrier[e1, dates[e1, e2].1] != calendrier[e2, dates[e1, e2].2]
+    calendrier[e1, dates[e1, e2].1] != calendrier[e1, dates[e1, e2].2]
 );
+    %     calendrier[e1, dates[e1, e2].1] != calendrier[e2, dates[e1, e2].2]
 
-% Trouver une solution qui maximisez le nombre de matchs joués tout en respectant les contraintes
+
+constraint objectif_match_espaces = sum(e1, e2 in equipes where e1 < e2)(abs(dates[e1, e2].1-dates[e1, e2].2)>=6);
+    
+%     let { var int: jour1 = dates[e1, e2].1, var int: jour2 = dates[e1, e2].2 } in (
+%         (jour1 != 0 /\ jour2 != 0) -> abs(jour1 - jour2) >= 6
+%     )
+% );
+
+% Trouver une solution qui maximisez le nombre de matchs espacés de 6 jours ou plus tout en respectant les contraintes
 solve maximize objectif_match_espaces;
 
 %-----------------------------------------------------------------------------%
