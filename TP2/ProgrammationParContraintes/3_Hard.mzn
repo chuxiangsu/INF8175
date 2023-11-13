@@ -63,7 +63,7 @@ constraint forall(j in jours, t in terrains where t != 0) (
 constraint forall(e in equipes) (
     count(j in jours)(calendrier[e, j] = equipe_indices[e]) = 7 /\
     
-    % Assurer qu'il ne joue seuelement pas pendant 2 jours
+    % Assurer qu'il ne joue seulement pas pendant 2 jours
     count(j in jours)(calendrier[e,j] = 0) = 2 /\
     
     % Assurer que les dates de match sont différentes pour chaque équipe
